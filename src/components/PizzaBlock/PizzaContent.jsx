@@ -1,10 +1,38 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-export default function PizzaContent({ title, price, imageUrl, sizes, types }) {
+import { addItem } from "../../redux/slices/cardSlice";
+
+const typeNames = ["тонкое", "традиционное"];
+
+export default function PizzaContent({
+  id,
+  title,
+  price,
+  imageUrl,
+  sizes,
+  types,
+}) {
+  const dispatch = useDispatch();
+  const cartItem = useSelector((state) =>
+    state.card.items.find((obj) => obj.id === id),
+  );
   const [typeActive, setActiveType] = useState(0);
   const [sizeActive, setActiveSize] = useState(0);
 
-  const typeNames = ["тонкое", "традиционное"];
+  const addedCount = cartItem ? cartItem.count : 0;
+
+  const onClickAdd = () => {
+    const item = {
+      title,
+      price,
+      id,
+      imageUrl,
+      type: typeNames[typeActive],
+      size: sizes[sizeActive],
+    };
+    dispatch(addItem(item));
+  };
 
   // Component of Types of Теста
   function Types() {
@@ -59,8 +87,8 @@ export default function PizzaContent({ title, price, imageUrl, sizes, types }) {
               fill="white"
             />
           </svg>
-          <span>Добавить</span>
-          <i>0</i>
+          <span onClick={onClickAdd}>Добавить</span>
+          {addedCount > 0 && <i>{addedCount}</i>}
         </button>
       </div>
     </div>
